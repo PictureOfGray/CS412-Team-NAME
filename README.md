@@ -23,6 +23,6 @@ Parts:
 -F: Present
 
 Who's responsible for what:
--Dorian:
--Julie:
--John:
+-Dorian: E, F
+-Julie: C, D
+-John: A, B
