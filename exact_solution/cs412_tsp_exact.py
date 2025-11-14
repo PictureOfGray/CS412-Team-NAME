@@ -3,23 +3,23 @@
     in the traveling salesperson problem.
 """
 
-
 from itertools import permutations
+from os import system
 def main():
     G = {}
     nodes = set()
     v, e = input().strip().split()
     v, e = int(v), int(e)
-
+    
     # Build our graph using the input
-    for _ in range(v):
-        v1, v2, e = input().split()
+    for _ in range(e):
+        v1, v2, ew = input().split()
         if v1 not in G:
             G[v1] = {}
         if v2 not in G:
             G[v2] = {}
-        G[v1][v2] = float(e)
-        G[v2][v1] = float(e)
+        G[v1][v2] = float(ew)
+        G[v2][v1] = float(ew)
         nodes.add(v1)
         nodes.add(v2)
     
