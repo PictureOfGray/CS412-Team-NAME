@@ -33,8 +33,9 @@ def main():
                 curr += G[perm[i]][perm[0]]
             else:
                 curr += G[perm[i]][perm[i + 1]]
-        best = min(curr, best)
-        best_path = perm + (perm[0],)
+        if min(curr, best) != best:
+            best = curr
+            best_path = perm + (perm[0],)
     print(f"{best:.4f}\n{" ".join(best_path)}")
 
 ## Approximation Algorithm: iterative improvement
