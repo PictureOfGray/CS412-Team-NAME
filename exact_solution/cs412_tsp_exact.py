@@ -42,7 +42,7 @@ def main(testing=False):
             best_path = perm + (perm[0],)
     delta = (perf_counter() - start)
     if not testing:
-        print(f"{best:.4f}\n{" ".join(best_path)}")
+        print(f"{best:.4f}\n{' '.join(best_path)}")
     else:
         print(f"Execution time for {v} locations: {delta:.10f} seconds")
 
