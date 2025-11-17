@@ -4,8 +4,10 @@
 """
 
 from itertools import permutations
-from os import system
-def main():
+import sys
+from time import perf_counter
+
+def main(testing=False):
     G = {}
     nodes = set()
     v, e = input().strip().split()
@@ -23,6 +25,7 @@ def main():
         nodes.add(v1)
         nodes.add(v2)
     
+    start = perf_counter()
     # Try all permutations of the paths to find a shortest distance path
     node_permutations = permutations(nodes)
     best = float('inf')
@@ -36,9 +39,16 @@ def main():
         if min(curr, best) != best:
             best = curr
             best_path = perm + (perm[0],)
-    print(f"{best:.4f}\n{" ".join(best_path)}")
+    delta = (perf_counter() - start)
+    if not testing:
+        print(f"{best:.4f}\n{" ".join(best_path)}")
+    else:
+        print(f"Execution time for {v} locations: {delta:.10f} seconds")
 
 ## Approximation Algorithm: iterative improvement
 
 if __name__ == "__main__":
-    main()
+    if sys.argv[-1] == "test":
+        main(True)
+    else:
+        main()
