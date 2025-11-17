@@ -7,12 +7,13 @@ from itertools import permutations
 import sys
 from time import perf_counter
 
+
 def main(testing=False):
     G = {}
     nodes = set()
     v, e = input().strip().split()
     v, e = int(v), int(e)
-    
+
     # Build our graph using the input
     for _ in range(e):
         v1, v2, ew = input().split()
@@ -24,7 +25,7 @@ def main(testing=False):
         G[v2][v1] = float(ew)
         nodes.add(v1)
         nodes.add(v2)
-    
+
     start = perf_counter()
     # Try all permutations of the paths to find a shortest distance path
     node_permutations = permutations(nodes)
@@ -45,7 +46,6 @@ def main(testing=False):
     else:
         print(f"Execution time for {v} locations: {delta:.10f} seconds")
 
-## Approximation Algorithm: iterative improvement
 
 if __name__ == "__main__":
     if sys.argv[-1] == "test":
