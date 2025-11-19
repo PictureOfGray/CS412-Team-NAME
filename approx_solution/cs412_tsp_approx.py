@@ -21,7 +21,6 @@ enumeration, while GENERALLY producing high-quality tours.
 
 from time import perf_counter
 import sys
-import math
 
 
 def distance(G, a, b):
