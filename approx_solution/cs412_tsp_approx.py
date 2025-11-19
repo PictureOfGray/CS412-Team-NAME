@@ -91,6 +91,8 @@ def two_opt(G, path):
     It repeatedly tries reversing path segments and keeps any change
     that reduces total tour length.
 
+    Polynomial run-time -> O(n²) * O(1) + O(n) * O(n)  =  O(n³)
+
     Parameters:
         G (dict): Graph adjacency dictionary.
         path (list): Initial TSP tour.
