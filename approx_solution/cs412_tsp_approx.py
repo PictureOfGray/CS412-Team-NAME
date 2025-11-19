@@ -98,36 +98,28 @@ def two_opt(G, path):
     Returns:
         list: Locally optimized tour.
     """
-    improved = True
     best_path = path[:]
     best_len = tour_length(G, best_path)
+    n = len(best_path)
 
-    # Continue until no improvements can be made
-    while improved:
-        improved = False
+    # One full polynomial pass: O(n^3)
+    for i in range(1, n - 2):
+        for j in range(i + 1, n - 1):
 
-        # Try all possible edge pair swaps
-        for i in range(1, len(best_path) - 2):
-            for j in range(i + 1, len(best_path) - 1):
+            # Skip adjacent edges
+            if j - i == 1:
+                continue
 
-                # Skip adjacent edges (no improvement possible)
-                if j - i == 1:
-                    continue
+            # Candidate by reversing segment
+            candidate = best_path[:]
+            candidate[i:j] = reversed(best_path[i:j])
 
-                # Create new candidate path by reversing the segment
-                new_path = best_path[:]
-                new_path[i:j] = reversed(best_path[i:j])
+            candidate_len = tour_length(G, candidate)
 
-                new_len = tour_length(G, new_path)
-
-                # Accept the improvement
-                if new_len < best_len:
-                    best_len = new_len
-                    best_path = new_path
-                    improved = True
-                    break  # restart search
-            if improved:
-                break
+            # Accept if improved
+            if candidate_len < best_len:
+                best_len = candidate_len
+                best_path = candidate
 
     return best_path
 
