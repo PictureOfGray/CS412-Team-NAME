@@ -98,28 +98,42 @@ def two_opt(G, path):
     Returns:
         list: Locally optimized tour.
     """
-    best_path = path[:]
-    best_len = tour_length(G, best_path)
-    n = len(best_path)
+    n = len(path)
 
-    # One full polynomial pass: O(n^3)
+    # Precompute full path length
+    best_len = tour_length(G, path)
+    best_path = path
+
     for i in range(1, n - 2):
         for j in range(i + 1, n - 1):
 
-            # Skip adjacent edges
+            # skip adjacent
             if j - i == 1:
                 continue
 
-            # Candidate by reversing segment
-            candidate = best_path[:]
-            candidate[i:j] = reversed(best_path[i:j])
+            a, b = best_path[i - 1], best_path[i]
+            c, d = best_path[j], best_path[(j + 1) % n]
 
-            candidate_len = tour_length(G, candidate)
+            # cost before
+            old_cost = G[a][b] + G[c][d]
 
-            # Accept if improved
-            if candidate_len < best_len:
-                best_len = candidate_len
-                best_path = candidate
+            # cost if reversed
+            new_cost = G[a][c] + G[b][d]
+
+            # If not better, skip
+            if new_cost >= old_cost:
+                continue
+
+            # ---- ACCEPTED SWAP ----
+            # Reverse the segment i..j IN PLACE
+            # This is the only O(k) operation and happens only for improvements
+            while i < j:
+                best_path[i], best_path[j] = best_path[j], best_path[i]
+                i += 1
+                j -= 1
+
+            # Recompute new tour length once per accepted change
+            best_len = tour_length(G, best_path)
 
     return best_path
 
