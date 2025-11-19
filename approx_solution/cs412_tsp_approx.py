@@ -14,11 +14,6 @@ enumeration, while GENERALLY producing high-quality tours.
 
 """
 
-# Approximation Algorithm: iterative improvement
-# Repeatedly try swapping two edges to reduce total distance.
-# Stop when no improvements remain.
-
-
 from time import perf_counter
 import sys
 
@@ -56,6 +51,7 @@ def tour_length(G, path):
     total += distance(G, path[-1], path[0])
     return total
 
+
 # Heuristic number 1
 def nearest_neighbor(G, nodes):
     """
@@ -84,6 +80,7 @@ def nearest_neighbor(G, nodes):
         current = next_node
 
     return path
+
 
 # Heuristic number 2
 def two_opt(G, path):
