@@ -92,7 +92,7 @@ def canonical_cycle(path):
     return rotated + [rotated[0]]
 
 
-def main(testing=False):
+def main(testing=False, run_count=1):
     G = {}
     nodes = set()
 
@@ -115,23 +115,33 @@ def main(testing=False):
 
     start = perf_counter()
 
-    # Step 1: Multi-start nearest neighbor + random restarts
-    nn_path = best_nearest_neighbor(G, nodes, restarts=3)
+    # Run Steps 1–3 ten times and keep the global best
+    global_best_len = float("inf")
+    global_best_path = None
 
-    # Step 2: Run 2-opt for local improvement
-    opt_path = two_opt(G, nn_path)
+    for _ in range(run_count):
+        # Step 1: Multi-start nearest neighbor + random restarts
+        nn_path = best_nearest_neighbor(G, nodes, restarts=10)
 
-    # Step 3: Canonical cycle
-    best_path = canonical_cycle(opt_path)
+        # Step 2: Run 2-opt for local improvement
+        opt_path = two_opt(G, nn_path)
 
-    # Compute final path length
-    best = tour_length(G, opt_path)
+        # Step 3: Canonical cycle
+        best_path = canonical_cycle(opt_path)
+
+        # Compute final path length for this iteration
+        best_len = tour_length(G, opt_path)
+
+        # Update global best if improved
+        if best_len < global_best_len:
+            global_best_len = best_len
+            global_best_path = best_path
 
     delta = perf_counter() - start
 
     if not testing:
-        print(f"{best:.4f}")
-        print(" ".join(best_path))
+        print(f"{global_best_len:.4f}")
+        print(" ".join(global_best_path))
     else:
         print(f"Execution time for {v} locations: {delta:.10f} seconds")
 
@@ -140,4 +150,4 @@ if __name__ == "__main__":
     if sys.argv[-1] == "test":
         main(True)
     else:
-        main()
+        main(False, 10000)

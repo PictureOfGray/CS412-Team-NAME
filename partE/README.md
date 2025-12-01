@@ -6,7 +6,32 @@ Objective, per Molloy and paraphrased by Dorian C.:
 Hint from Molloy:
 -The longer you run it, the closer you get to our optimal answer. How does adding more time improve things?
 
-Queries with Copilot:
+# Running v2.5 a bunch of times:
+v2.5 just has a for loop and some minor changes. That for loop depends on an inputted parameter, and runs the main steps of v2 in that loop, while finding the global minimum. This is to see if making that parameter for the for loop larger, i.e. making it run more to find the min, is actually more reliable.
+
+We'll be using the 108_11_input.txt file for this experiment.
+
+## If that parameter is 1, and the program is ran 100 times:
+1st trial: 108.0000 appears 78 times, 11.0000 appears 21 times, 12.0000 appears 1 time
+2nd trial: 108.0000 appears 81 times, 11.0000 appears 18 times, 12.0000 appears 1 time
+3rd trial: 108.0000 appears 66 times, 11.0000 appears 34 times
+
+Avg: 75% of the time it's 108, 24.33% of the time it's 11, and .67% of the time it's 12
+
+## If that parameter is 10000 (i.e. the for loop for the actual steps runs 10,000 times) and the program is ran 100 times:
+1st trial: 108.0000 appears 82 times, 11.0000 appears 18 times
+2nd trial: 108.0000 appears 77 times, 11.0000 appears 21 times, 12.0000 appears 2 times
+3rd trial: 108.0000 appears 72 times, 11.0000 appears 28 times
+
+Avg: 77% of the time, it's 108, 22.33% of the time it's 11, and .67% of the time it's 12
+
+## Conclusion:
+The 3rd trial of the first half was weird, and threw off the data a bit. Regardless, the numbers are close enough that it doesn't matter. Which could show the strength of our approach, maybe, or incompetence on the designer of v2.5's part
+
+## What if we change the restarts parameter in best_nearest_neighbor to 10 and run the program 100 times?
+Trial 1: 108.0000 appears 56 times, 11.0000 appears 17 times
+
+# Queries with Copilot:
 *NOTE: I changed my settings with Copilot so it calls me "your Excellency." Just ignore it*
 
 # Query 1: Setting the Stage, pt 1
