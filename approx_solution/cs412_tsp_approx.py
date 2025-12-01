@@ -103,7 +103,6 @@ def two_opt(G, path):
     n = len(path)
 
     # Precompute full path length
-    best_len = tour_length(G, path)
     best_path = path
 
     for i in range(1, n - 2):
@@ -133,9 +132,6 @@ def two_opt(G, path):
                 best_path[i], best_path[j] = best_path[j], best_path[i]
                 i += 1
                 j -= 1
-
-            # Recompute new tour length once per accepted change
-            best_len = tour_length(G, best_path)
 
     return best_path
 
