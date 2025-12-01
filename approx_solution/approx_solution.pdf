@@ -1,0 +1,15 @@
+1. Explain the strategy of the approximation.
+
+
+
+2. Discuss the analytical runtime analysis of the approximation.
+
+
+
+3. Results of approximation running "reasonably well" on tests
+   in gradescope.
+
+
+
+4. run_test_cases.sh showcases at least 3 test cases with 1 
+   non-optimal results.
