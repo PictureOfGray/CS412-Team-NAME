@@ -136,7 +136,7 @@ e f 1.0
 
 - **2‑opt won’t fix it**: Any single 2‑edge swap in a b c d e f a increases cost (e.g., replacing (b,c) + (f,a) = 1 + 100 with (b,f) + (c,a) = 40 + 100), so the algorithm remains at 143.0 rather than reaching 104.0.
 
-# Query 6: Plugging it
+# Query 6: Plugging it & creating cs412_tsp_approx_v2.py
 As a computer scientist looking at the code I have provided and the input you created, how would you change the code?
 
 ## Copilot's Response
@@ -222,3 +222,66 @@ def canonical_cycle(path):
 ---
 
 Would you like me to **rewrite your code with these improvements integrated** (multi-start nearest neighbor, canonical output, and randomized restarts), so you can see a polished version that avoids the worst-case pitfalls?
+
+*NOTE: I said yes, and this is cs412_tsp_approx_v2.py, or commit ae5fa2fd85d749d3f509258b1b869134e4058d06*
+
+# Query 7: New Hole
+You are a computer scientist. Given the following code for an approximate solution to the Traveling Salesman Problem, create an example input that would produce a tour much longer than the optimal tour:
+*insert the v2 code here*
+
+## Copilot's Response:
+Your Excellency, here is a clean complete-graph input that reliably traps the given heuristic (multi-start nearest neighbor + 2-opt) into a tour far longer than the optimal cycle by using two cheap “bridges” between two tight clusters. The greedy construction closes the tour with an expensive inter-cluster edge that 2-opt struggles to remove.
+
+---
+
+### Example input (8 vertices, complete graph)
+
+```
+8 28
+a b 1.0
+a c 2.0
+a d 2.0
+a e 100.0
+a f 100.0
+a g 100.0
+a h 100.0
+b c 1.0
+b d 2.0
+b e 2.0
+b f 100.0
+b g 100.0
+b h 100.0
+c d 1.0
+c e 100.0
+c f 100.0
+c g 100.0
+c h 100.0
+d e 100.0
+d f 100.0
+d g 100.0
+d h 2.0
+e f 1.0
+e g 1.0
+e h 2.0
+f g 1.0
+f h 2.0
+g h 1.0
+```
+
+- **Cluster 1:** {a, b, c, d} with mostly 1–2 weights.
+- **Cluster 2:** {e, f, g, h} with mostly 1–2 weights.
+- **Inter-cluster edges:** 100.0 everywhere except two cheap bridges b–e = 2.0 and d–h = 2.0.
+
+---
+
+### Intuition
+- Nearest neighbor from any node exhausts one cluster via low weights, crosses into the other cluster via a cheap bridge, then exhausts it, but the final edge returning to the starting node is almost always a 100.0 inter-cluster edge.
+- 2-opt typically stalls because escaping this trap requires a global rearrangement that uses both cheap bridges while avoiding any 100.0 edge in the closing step.
+
+### Contrast with the optimal
+- An optimal cycle can use both cheap bridges and avoid all 100.0 inter-cluster edges by threading clusters together:
+  - For example: a → b → e → f → g → h → d → c → a
+  - Edge costs: 1.0 + 2.0 + 1.0 + 1.0 + 1.0 + 2.0 + 1.0 + 2.0 = 11.0
+- The heuristic often returns a tour exceeding 100 due to a single expensive closing edge, producing a gap of nearly an order of magnitude.
+
+*NOTE: The v2 solution actually gets 11 sometimes, but also hits 108 a lot of the time*
