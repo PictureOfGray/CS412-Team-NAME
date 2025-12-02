@@ -1,12 +1,15 @@
 # Make an input graph to the hamiltonian cycle problem complete
-def hamiltonian_to_tsp(G, V):
 
-    # O(V^2)
-    for v in G:                             # O(V)
-        for u in V:                         # O(V)
-            if u not in G[v] and u != v:    # O(1) 
-                G[v][u] = float('inf')      # O(1)
-    return
+
+
+# O(V^2)
+def hamiltonian_to_tsp(G, V):
+    for v in G:
+        for u in V:
+            if u not in G[v] and u != v:
+                G[v][u] = float('inf')
+
+
 
 
 
