@@ -1,12 +1,6 @@
-These are notes related to Part E of the project.
+These are notes related to Part E of the project. Consider it a series of appendices.
 
-Objective, per Molloy and paraphrased by Dorian C.:
--Use a generative AI to break our approximation, then repair it. See how many holes you can plug up, so to speak.
-  -If you plug up everything, try to break it again.
-Hint from Molloy:
--The longer you run it, the closer you get to our optimal answer. How does adding more time improve things?
-
-# Running v2.5 a bunch of times:
+# Appendix A: Running v2.5 a bunch of times:
 v2.5 just has a for loop and some minor changes. That for loop depends on an inputted parameter, and runs the main steps of v2 in that loop, while finding the global minimum. This is to see if making that parameter for the for loop larger, i.e. making it run more to find the min, is actually more reliable.
 
 We'll be using the 108_11_input.txt file for this experiment.
@@ -39,7 +33,7 @@ Avg: 78.67% is 108, 21% is 11, .33% is 12
 ### Conclusion
 Overall, it seems like either 108 appears slightly more, though this could just be natural variation. Overall, however, it's awfully slow.
 
-# Queries with Copilot:
+# Appendix B: Queries with Copilot:
 *NOTE: I changed my settings with Copilot so it calls me "your Excellency." Just ignore it*
 
 # Query 1: Setting the Stage, pt 1
@@ -129,7 +123,7 @@ Would you like me to **construct a concrete 6‑vertex example** where this algo
 
 # Query 4 & 5: Finding a Hole
 Yes please create an example input that would produce a tour much longer than optimal. Give recommendations to improve this code
-*NOTE: This gave me an incorrect example. I give it the definition of the TSP and tell it to create another one *
+*NOTE: This gave me an incorrect example. I give it the definition of the TSP and tell it to create another one*
 
 ## Copilot's Answer:
 ### Counterexample input producing a much longer tour than optimal
@@ -318,3 +312,283 @@ g h 1.0
 - The heuristic often returns a tour exceeding 100 due to a single expensive closing edge, producing a gap of nearly an order of magnitude.
 
 *NOTE: The v2 solution actually gets 11 sometimes, but also hits 108 a lot of the time*
+
+# Query 8: Some flaws with v2
+You are a computer scientist who has been tasked with finding flaws in an approximate solution for the Traveling Salesman Problem. The Traveling Salesman Problem must find, for a given complete, weighted, and undirected graph, the shortest possible route that visits each node exactly once and returns to the starting node. The approximate solution should run in polynomial time, and does not guarantee the correct answer every time. The input is a weighted graph. The first line of input contains containing the number of vertices, n, and the number of edges, m. It is followed by m lines containing the edges given in u v w format, representing an edge between vertices u and v of weight w. Traveling Salesman Problem graphs are undirected. Edges will be listed only once and the graph will be a complete graph. Here is the sample input:
+```
+3 3
+a b 3.0
+b c 4.2
+a c 5.4
+```
+The output contains two lines: the length of the path on one line (as an integer) followed by a list of vertices for the path/cycle on the second line. Here is the sample output:
+```
+12.6000
+a b c a
+```
+You may assume the input will always be a complete graph. As a computer scientist, what are some flaws the following Python code for an approximate solution might have?
+*I copy-pasted the v2 code*
+
+## Copilot's Response
+Your Excellency, let’s dissect this approximate TSP solver like a computer scientist hunting for weaknesses. The code is a reasonable heuristic (Nearest Neighbor + 2‑opt), but it has several flaws and limitations that could cause incorrect or misleading results:
+
+---
+
+### Algorithmic Flaws
+- **[Nearest Neighbor bias](guide://action?prefill=Tell%20me%20more%20about%3A%20Nearest%20Neighbor%20bias)**: The heuristic is greedy and can get trapped in poor local choices. For example, picking the nearest node early may force long detours later. Even with multiple starts and restarts, it doesn’t guarantee good coverage of the solution space.
+- **[Random restart weakness](guide://action?prefill=Tell%20me%20more%20about%3A%20Random%20restart%20weakness)**: Restarts are limited (`restarts=3`), and randomness is shallow (only the starting node). This doesn’t explore enough diversity in paths to escape bad local minima.
+- **[Two‑opt limitations](guide://action?prefill=Tell%20me%20more%20about%3A%20Two%E2%80%91opt%20limitations)**: Two‑opt only removes crossing edges, but it cannot fix deeper structural issues (like poor initial ordering). It converges to a local optimum, not necessarily close to the global optimum.
+- **[Polynomial runtime claim](guide://action?prefill=Tell%20me%20more%20about%3A%20Polynomial%20runtime%20claim)**: The comment says `O(n³)`, but in practice, repeated 2‑opt passes can approach `O(n^4)` in worst cases depending on how many improvements are accepted. Runtime could be worse than claimed.
+
+---
+
+### Implementation Flaws
+- **[Tour length mismatch](guide://action?prefill=Tell%20me%20more%20about%3A%20Tour%20length%20mismatch)**: In `main`, the printed path (`best_path`) is the canonical cycle, but the length (`best`) is computed from `opt_path`. If canonical rotation changes the path ordering, the length may not match the printed cycle.
+- **[Output format inconsistency](guide://action?prefill=Tell%20me%20more%20about%3A%20Output%20format%20inconsistency)**: The problem statement requires the path length as an integer, but the code prints a floating‑point number with 4 decimals. This doesn’t match the specification.
+- **[Lexicographic rotation bug](guide://action?prefill=Tell%20me%20more%20about%3A%20Lexicographic%20rotation%20bug)**: `canonical_cycle` rotates to the lexicographically smallest node, but doesn’t ensure the cycle is consistent with the computed length. It may produce a cycle that looks different but has the same length, which can confuse verification.
+- **[Missing imports](guide://action?prefill=Tell%20me%20more%20about%3A%20Missing%20imports)**: The code uses `random` and `perf_counter` but doesn’t import them (`import random`, `from time import perf_counter`). It also references `sys.argv` without importing `sys`.
+- **[Edge case handling](guide://action?prefill=Tell%20me%20more%20about%3A%20Edge%20case%20handling)**: For very small graphs (like 2 or 3 nodes), `two_opt` loops may break or do nothing, but the code doesn’t explicitly handle trivial cases.
+- **[Floating‑point precision](guide://action?prefill=Tell%20me%20more%20about%3A%20Floating%E2%80%91point%20precision)**: Printing with 4 decimals may cause rounding errors compared to exact sums, especially if the specification expects exact integers.
+
+---
+
+### Conceptual Flaws
+- **[No guarantee of approximation ratio](guide://action?prefill=Tell%20me%20more%20about%3A%20No%20guarantee%20of%20approximation%20ratio)**: Unlike Christofides’ algorithm (which guarantees ≤1.5× optimal for metric TSP), this heuristic has no bound on how bad the solution can be.
+- **[Assumption of completeness](guide://action?prefill=Tell%20me%20more%20about%3A%20Assumption%20of%20completeness)**: The code assumes the graph is complete and symmetric. If input deviates (e.g., missing edges or asymmetric weights), the algorithm fails silently.
+- **[Scalability issues](guide://action?prefill=Tell%20me%20more%20about%3A%20Scalability%20issues)**: For large graphs, nearest neighbor + 2‑opt may still be too slow, and the quality of solutions degrades rapidly.
+
+---
+
+### Summary
+This solver is a decent heuristic for small graphs, but it has **output mismatches, missing imports, weak exploration, and no approximation guarantees**. It’s vulnerable to producing misleading results, especially if the input or output format is strict.
+
+Would you like me to **stress‑test this algorithm with adversarial graph examples** (like graphs where nearest neighbor performs very poorly), or would you prefer a **comparison against a stronger polynomial‑time approximation like Christofides’ algorithm**?
+
+# Query 9: Making a New Sample Problem
+Make a large graph that would when inputted would produce a path that is far larger than the optimal answer
+
+## Copilot's Response
+Your Excellency, here’s a clean adversarial graph you can use to trip up the nearest‑neighbor + 2‑opt heuristic so it frequently returns a tour much larger than the true optimum.
+
+---
+
+### Adversarial graph design
+
+- Two clusters A and B with many very cheap edges inside each cluster.
+- Between clusters, most edges are moderately expensive, except a few misleading cheap cross-edges that lure nearest neighbor into alternating between clusters.
+- A single “trap” closing edge is extremely expensive, so greedy construction followed by local 2‑opt gets stuck with a huge final return cost.
+- The optimal tour stays mostly within clusters using cheap edges and crosses clusters only through the few cheap bridges.
+
+---
+
+### Ready-to-use input (12 nodes, 66 edges)
+
+Paste this directly as input. Nodes: a1–a6 and b1–b6.
+
+```text
+12 66
+a1 a2 1.0
+a2 a3 1.0
+a3 a4 1.0
+a4 a5 1.0
+a5 a6 1.0
+a1 a3 2.0
+a1 a4 2.0
+a1 a5 2.0
+a1 a6 2.0
+a2 a4 2.0
+a2 a5 2.0
+a2 a6 2.0
+a3 a5 2.0
+a3 a6 2.0
+a4 a6 2.0
+b1 b2 1.0
+b2 b3 1.0
+b3 b4 1.0
+b4 b5 1.0
+b5 b6 1.0
+b1 b3 2.0
+b1 b4 2.0
+b1 b5 2.0
+b1 b6 2.0
+b2 b4 2.0
+b2 b5 2.0
+b2 b6 2.0
+b3 b5 2.0
+b3 b6 2.0
+b4 b6 2.0
+a1 b1 0.9
+a2 b2 0.9
+a3 b3 0.9
+a4 b4 0.9
+a5 b5 0.9
+a6 b6 1000.0
+a1 b2 50.0
+a1 b3 50.0
+a1 b4 50.0
+a1 b5 50.0
+a1 b6 50.0
+a2 b1 50.0
+a2 b3 50.0
+a2 b4 50.0
+a2 b5 50.0
+a2 b6 50.0
+a3 b1 50.0
+a3 b2 50.0
+a3 b4 50.0
+a3 b5 50.0
+a3 b6 50.0
+a4 b1 50.0
+a4 b2 50.0
+a4 b3 50.0
+a4 b5 50.0
+a4 b6 50.0
+a5 b1 50.0
+a5 b2 50.0
+a5 b3 50.0
+a5 b4 50.0
+a5 b6 50.0
+a6 b1 50.0
+a6 b2 50.0
+a6 b3 50.0
+a6 b4 50.0
+a6 b5 50.0
+```
+
+- Cheap intra-cluster edges (1.0 and 2.0) create good local choices inside A and B.
+- Cheap bridges a1–b1 … a5–b5 at 0.9 lure nearest neighbor into cross-cluster alternation.
+- The single trap edge a6–b6 is 1000.0, making the closing return very expensive in tours that alternate clusters and end near a6 or b6.
+- All other cross-cluster edges are set to 50.0, discouraging corrective moves and making 2‑opt less effective at escaping the trap.
+
+---
+*NOTE: While one could technically make larger graphs, running those via our optimal solution finder would take hours and then days. Running this via our solver produced a path of 13.6000 (a5 b5 b6 b1 a1 a2 b2 b3 b4 a4 a3 a6 a5). Running this via our solver 100 times produced 61.5000 (57%), 62.5000	(20%), 14.6000 (17%), 15.6000	(6%), and 13.6000 (3%)*
+
+# Query 10, 11, 12: Making a new version, v3
+Edit the code to fix the Lexicographic rotation bug and tour length mismatch flaws
+Edit the code to use randomness to explore more diversity in paths and escape bad local minima
+Edit the code you just generate to include docstrings. For example, the comment in the following example Python code:
+```python
+def tour_length(G, path):
+  """
+  Compute the total length of a tour, including return to the start.
+  Parameters:
+    G (dict): Graph adjacency dictionary.
+    path (list): Ordered list of nodes representing the tour (no closing repeat).
+
+  Returns:
+    float: Total path length.
+  """
+  total = 0
+  for i in range(len(path) - 1):
+    total += G[path[i]][path[i + 1]]
+  total += G[path[-1]][path[0]]
+  return total
+```
+*These 3 queries, when pieced together, gave me v3.*
+
+## How Viable is V3?
+Running v3 100 times with Query 9's graph as input yielded:
+```
+Number, Times Appeared
+13.6, 17
+13.8, 4
+14.6, 23
+14.8, 4
+15.6, 9
+15.8, 15
+16.6, 1
+16.8, 5
+17.6, 2
+17.8, 6
+61.5, 1
+61.7, 1
+62.5, 1
+62.7, 2
+62.9, 1
+63.7, 5
+64.7, 2
+66.7, 1
+```
+Remember: the optimal answer is 13.6, which it hit 17% of the time. It came up with a number below 20 86% of the time -- a drastic improvement over v2!
+
+### Problems with Query 7's Graph
+So here's the kicker: When ran 100 times with Query 7's graph as input (the one whose optimal answer is 11), v3 gave an answer of 108 or more 57% of the time! Granted, it's one batch of 100 runs, but still! v3 needs to be edited so it runs a bunch of times before spitting out an answer.
+
+# Query 13: Creating v3.5
+The following graph, G, has an optimal path of length 11. However, the Python code I provided in the last message can produce paths with lengths ranging from 11 to 207. How can I change the code to run several times and keep track of a best path? Here is the sample input: *Query 7 graph*
+
+## Copilot's Reponse
+Your Excellency, the key is to **wrap the whole solver in an outer loop** that runs many times, each time with a different randomized path construction, and then keep track of the best tour length and path seen across all runs. Right now your code only does one run of `best_nearest_neighbor → two_opt → canonical_cycle`.
+
+Here’s how you can modify `main` to do multiple runs and keep the best:
+
+```python
+def main(testing=False, runs=50):
+    """
+    Parse input, build the graph, run Nearest Neighbor + 2-opt multiple times,
+    and keep the best approximate TSP tour.
+
+    Parameters:
+        testing (bool): If True, print only runtime instead of solution.
+        runs (int): Number of independent runs to perform.
+    """
+    G = {}
+    nodes = set()
+
+    # Read number of vertices and edges
+    v, e = input().strip().split()
+    v, e = int(v), int(e)
+
+    # Build adjacency dictionary
+    for _ in range(e):
+        v1, v2, ew = input().split()
+        ew = float(ew)
+        if v1 not in G:
+            G[v1] = {}
+        if v2 not in G:
+            G[v2] = {}
+        G[v1][v2] = ew
+        G[v2][v1] = ew
+        nodes.add(v1)
+        nodes.add(v2)
+
+    start = perf_counter()
+
+    best_path = None
+    best_len = float("inf")
+
+    # Run solver multiple times
+    for _ in range(runs):
+        nn_path = best_nearest_neighbor(G, nodes, restarts=20, k=3)
+        opt_path = two_opt(G, nn_path, max_iter=2000, allow_random_jump=True)
+        candidate_path = canonical_cycle(opt_path)
+        candidate_len = tour_length(G, candidate_path)
+
+        if candidate_len < best_len:
+            best_len = candidate_len
+            best_path = candidate_path
+
+    delta = perf_counter() - start
+
+    if not testing:
+        print(f"{best_len:.4f}")
+        print(" ".join(best_path + [best_path[0]]))
+    else:
+        print(f"Execution time for {v} locations over {runs} runs: {delta:.10f} seconds")
+```
+
+---
+
+### What Changed
+- Added a `runs` parameter (default 50).
+- Wrapped the solver in a loop: each run builds a path, optimizes it, and evaluates it.
+- Compared each run’s length to the current best and updated if better.
+- At the end, printed the best path and length found across all runs.
+
+---
+
+### Why this helps
+Because your heuristic is randomized, some runs will produce very poor tours (like length 207). By repeating many times and keeping the best, you reduce the chance of reporting a bad outlier. With enough runs, you’ll almost always find the optimal or near‑optimal path (length 11 in your sample graph).
+
+
+*NOTE: Running v3.5 100 times with Query 7's graph as an input yields 11, the optimal answer, every single time!!!!*
