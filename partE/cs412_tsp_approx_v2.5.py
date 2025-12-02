@@ -121,7 +121,7 @@ def main(testing=False, run_count=1):
 
     for _ in range(run_count):
         # Step 1: Multi-start nearest neighbor + random restarts
-        nn_path = best_nearest_neighbor(G, nodes, restarts=10)
+        nn_path = best_nearest_neighbor(G, nodes, restarts=3)
 
         # Step 2: Run 2-opt for local improvement
         opt_path = two_opt(G, nn_path)
