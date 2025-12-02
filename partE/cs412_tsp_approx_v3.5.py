@@ -86,13 +86,18 @@ def two_opt(G, path, max_iter=1000, allow_random_jump=True):
     """
     Perform 2-opt optimization with occasional random acceptance.
 
-    This version of 2-opt sometimes accepts worse moves (with small probability)
-    to escape local minima, similar to simulated annealing.
+    The 2-opt heuristic improves a TSP tour by removing crossing edges:
+    - It iterates over all pairs of edges in the path.
+    - For each pair, it checks if swapping the endpoints (reversing the segment between them)
+      would reduce the total tour length.
+    - If so, it applies the swap.
+    - Optionally, it can accept a worse swap with small probability (simulated annealing style)
+      to escape local minima.
 
     Parameters:
         G (dict): Graph adjacency dictionary.
         path (list): Initial TSP tour (no closing repeat).
-        max_iter (int): Maximum number of iterations.
+        max_iter (int): Maximum number of iterations through the path.
         allow_random_jump (bool): Whether to allow occasional random acceptance.
 
     Returns:
@@ -100,14 +105,22 @@ def two_opt(G, path, max_iter=1000, allow_random_jump=True):
     """
     improved = True
     iters = 0
+
+    # Continue until no improvement or until max_iter iterations are reached
     while improved and iters < max_iter:
         improved = False
         iters += 1
+
+        # Loop through all possible pairs of edges (i, j)
         for i in range(1, len(path) - 2):
             for j in range(i + 1, len(path) - 1):
+                # Skip adjacent edges, as swapping doesn't do anything
                 if j - i == 1:
                     continue
+
+                # Current edge costs: (i-1 -> i) and (j -> j+1)
                 d1 = G[path[i - 1]][path[i]] + G[path[j]][path[j + 1]]
+                # New edge costs if we reverse the segment
                 d2 = G[path[i - 1]][path[j]] + G[path[i]][path[j + 1]]
 
                 if d2 < d1 or (allow_random_jump and random.random() < 0.01):
