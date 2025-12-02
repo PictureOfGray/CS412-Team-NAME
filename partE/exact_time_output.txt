@@ -1,0 +1,5 @@
+Execution time for 11 locations: 194.1349700000 seconds
+Execution time for 11 locations: 121.2667656000 seconds
+Execution time for 11 locations: 50.4360771000 seconds
+Execution time for 11 locations: 49.3681693000 seconds
+Execution time for 11 locations: 224.0587756000 seconds

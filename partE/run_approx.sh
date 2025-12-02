@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Output file
-OUTFILE="approx_output.txt"
+OUTFILE="approx_length_output.txt"
 
 # Clear any previous results
 > "$OUTFILE"
@@ -10,6 +10,6 @@ OUTFILE="approx_output.txt"
 for i in {1..100}
 do
     # Run the solver, feed it input.txt, take only the first line (the length)
-    LENGTH=$(python3 cs412_tsp_approx_v3.5.py test < input.txt | head -n 1)
+    LENGTH=$(python3 ../approx_solution/cs412_tsp_approx.py < in.txt | head -n 1)
     echo "$LENGTH" >> "$OUTFILE"
 done

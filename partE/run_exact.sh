@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Output file
-OUTFILE="exact_output.txt"
+OUTFILE="exact_time_output.txt"
 
 # Clear any previous results
 > "$OUTFILE"
@@ -10,6 +10,6 @@ OUTFILE="exact_output.txt"
 for i in {1..100}
 do
     # Run the solver, feed it input.txt, take only the first line (the length)
-    LENGTH=$(python3 cs412_tsp_approx_v3.5.py test < input.txt | head -n 1)
+    LENGTH=$(python3 ../exact_solution/cs412_tsp_exact.py test < in.txt | head -n 1)
     echo "$LENGTH" >> "$OUTFILE"
 done

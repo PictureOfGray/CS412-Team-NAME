@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Output file
-OUTFILE="v3.5parallel_output.txt"
+OUTFILE="v3.5parallel_length_output.txt"
 
 # Clear any previous results
 > "$OUTFILE"
@@ -10,6 +10,6 @@ OUTFILE="v3.5parallel_output.txt"
 for i in {1..100}
 do
     # Run the solver, feed it input.txt, take only the first line (the length)
-    LENGTH=$(python3 cs412_tsp_approx_v3.5_parallelized.py test < input.txt | head -n 1)
+    LENGTH=$(python3 cs412_tsp_approx_v3.5_parallelized.py < in.txt | head -n 1)
     echo "$LENGTH" >> "$OUTFILE"
 done
