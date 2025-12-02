@@ -1,5 +1,7 @@
 These are notes related to Part E of the project. Consider it a series of appendices.
 
+Shoutouts to https://csacademy.com/app/graph_editor/
+
 # Appendix A: Running v2.5 a bunch of times:
 v2.5 just has a for loop and some minor changes. That for loop depends on an inputted parameter, and runs the main steps of v2 in that loop, while finding the global minimum. This is to see if making that parameter for the for loop larger, i.e. making it run more to find the min, is actually more reliable.
 
