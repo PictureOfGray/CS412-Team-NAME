@@ -27,8 +27,7 @@ def main(testing=False):
         nodes.add(v2)
 
     start = perf_counter()
-
-
+    # Try all permutations of the paths to find a shortest distance path
     node_permutations = permutations(nodes)
     best = float('inf')
     for perm in node_permutations:
@@ -41,8 +40,6 @@ def main(testing=False):
         if min(curr, best) != best:
             best = curr
             best_path = perm + (perm[0],)
-
-
     delta = (perf_counter() - start)
     if not testing:
         print(f"{best:.4f}\n{' '.join(best_path)}")
