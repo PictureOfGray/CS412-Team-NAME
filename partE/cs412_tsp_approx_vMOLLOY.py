@@ -7,6 +7,7 @@ from time import perf_counter
 # As you lower these parameters, however, accuracy decreases. For big graphs there's a palpable tradeoff between accuracy and time.
 # (for example, it took 2.3 minutes to run this once on my machine, but of the 5 iterations I've done I've seen 5 different answers).
 # So if you've got nothing much to do, you can set this to 300 or something and then go watch a movie.
+# In main, feel free to change main's path parameter, and/or best_nearest_neighbor and two_opt's restarts and max_iter parameters (respectively).
 
 
 def tour_length(G, path):
