@@ -5,7 +5,7 @@ from time import perf_counter
 # NOTE: in main, runs = 25, best_nearest_neighbor has 5, two_opt has 10. This is a really budget version for very big graphs.
 # While higher numbers can be set as the parameters for smaller graphs (ex: 11 node), you really shouldn't for big graphs (ex: one with 561270 edges and 1060 nodes)
 # As you lower these parameters, however, accuracy decreases. For big graphs there's a palpable tradeoff between accuracy and time.
-# (for example, it took 2.3 minutes to run this on my machine).
+# (for example, it took 2.3 minutes to run this once on my machine, but of the 5 iterations I've done I've seen 5 different answers).
 # So if you've got nothing much to do, you can set this to 300 or something and then go watch a movie.
 
 
