@@ -56,7 +56,7 @@ def nearest_neighbor(G, nodes, start=None, k=2):
     return path
 
 
-def best_nearest_neighbor(G, nodes, restarts=10, k=2):
+def best_nearest_neighbor(G, nodes, restarts=5, k=2):
     """
     Run randomized nearest neighbor multiple times and keep the best tour.
 
@@ -81,7 +81,7 @@ def best_nearest_neighbor(G, nodes, restarts=10, k=2):
 
     return best_path
 
-def two_opt(G, path, max_iter=1000, allow_random_jump=True):
+def two_opt(G, path, max_iter=100, allow_random_jump=True):
     """
     Perform 2-opt optimization with occasional random acceptance.
 
@@ -176,10 +176,10 @@ def main(testing=False):
     start = perf_counter()
 
     # Step 1: Multi-start nearest neighbor + random restarts
-    nn_path = best_nearest_neighbor(G, nodes, restarts=20, k=3)
+    nn_path = best_nearest_neighbor(G, nodes, restarts=5, k=3)
 
     # Step 2: Run 2-opt for local improvement
-    opt_path = two_opt(G, nn_path, max_iter=2000, allow_random_jump=True)
+    opt_path = two_opt(G, nn_path, max_iter=10, allow_random_jump=True)
 
     # Step 3: Canonical cycle (no closing repeat)
     best_path = canonical_cycle(opt_path)

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Output file
-OUTFILE="v3.5_length_output.txt"
+OUTFILE="v3.5_output.txt"
 
 # Clear any previous results
 > "$OUTFILE"
